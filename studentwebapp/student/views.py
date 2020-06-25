@@ -1,22 +1,31 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from rest_framework.parsers import JSONParser
 from student.models import Student
 from student.serializers import StudentSerializer
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import mixins
+from rest_framework import generics
 
 # Create your views here.
 
-@csrf_exempt
-def student_list(request):
-    if request.method == "GET":
-        students = Student.objects.all()
-        serializer = StudentSerializer(students, many=True)
-        return JsonResponse(serializer.data, safe=False) 
-    elif request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = StudentSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+class MyView(generics.GenericAPIView,
+             mixins.ListModelMixin,
+             mixins.DestroyModelMixin,
+             mixins.CreateModelMixin,
+             mixins.RetrieveModelMixin,
+             mixins.UpdateModelMixin):
+
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
