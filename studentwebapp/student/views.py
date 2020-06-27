@@ -45,3 +45,6 @@ class SubjectView(generics.GenericAPIView,
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
