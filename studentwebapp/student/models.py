@@ -9,3 +9,8 @@ class Student(models.Model):
     image = models.ImageField(upload_to='media', null=True)
     def __str__(self):
         return self.name
+
+
+class Subjects(models.Model):
+    student = models.ForeignKey(to=Student, on_delete=models.CASCADE)
+    subject_name = models.CharField(max_length=10)
