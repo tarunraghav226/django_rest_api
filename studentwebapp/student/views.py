@@ -1,11 +1,13 @@
 from student.models import Student, Subjects
-from student.serializers import StudentSerializer, SubjectSerializer
+from student.serializers import StudentSerializer, SubjectSerializer, UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import mixins
 from rest_framework import generics
-
+from rest_framework import permissions
+from django.contrib.auth.models import User
+from .permissions import IsOwnerOrReadOnly
 # Create your views here.
 
 class StudentView(generics.GenericAPIView,
@@ -17,6 +19,8 @@ class StudentView(generics.GenericAPIView,
 
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -34,6 +38,9 @@ class StudentView(generics.GenericAPIView,
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class SubjectView(generics.GenericAPIView,
                   mixins.ListModelMixin,
@@ -48,3 +55,13 @@ class SubjectView(generics.GenericAPIView,
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
