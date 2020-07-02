@@ -20,13 +20,15 @@ from student.views import StudentView, SubjectView, UserDetail, UserList
 from django.conf.urls.static import static
 from . import settings
 from django.conf.urls import include
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('students/',StudentView.as_view()),
-    path('students/<int:pk>', StudentView.as_view()),
+    path('students/<int:pk>/', StudentView.as_view()),
     path('subject/', SubjectView.as_view()),
     path('users/', UserList.as_view()),
     path('users/<int:pk>/', UserDetail.as_view()),
+    path('api-auth/', views.obtain_auth_token)
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

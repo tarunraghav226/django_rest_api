@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from django.contrib.auth.models import User
 from .permissions import IsOwnerOrReadOnly
+from rest_framework.authentication import TokenAuthentication
 # Create your views here.
 
 class StudentView(generics.GenericAPIView,
@@ -19,8 +20,8 @@ class StudentView(generics.GenericAPIView,
 
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
